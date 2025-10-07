@@ -1,0 +1,71 @@
+// Import required Wonderland Engine components
+import { WComponent, WPhysicsCollider, WRigidbody } from 'wonderland-engine';
+import * as THREE from 'three';
+
+class Slicer extends WComponent {
+    // Properties
+    materialAfterSlice;
+    sliceMask;
+    isTouched = false;
+
+    update(dt) {
+        // Runs if the object is touched by a slicable object
+        if (this.isTouched) {
+            this.isTouched = false;
+
+            // Use raycasting or trigger zone to check for slicable objects
+            let objectsToBeSliced = this.checkForSlicableObjects();
+
+            objectsToBeSliced.forEach(objectToBeSliced => {
+                let slicedObject = this.sliceObject(objectToBeSliced);
+
+                // Create new slices, you'll need to modify the mesh or use custom slicing logic
+                let upperHullGameObject = this.createUpperHull(slicedObject);
+                let lowerHullGameObject = this.createLowerHull(slicedObject);
+
+                // Apply physics and set positions for new slices
+                this.makeItPhysical(upperHullGameObject);
+                this.makeItPhysical(lowerHullGameObject);
+
+                // Remove the original object
+                objectToBeSliced.destroy();
+            });
+        }
+    }
+
+    checkForSlicableObjects() {
+        // Custom method to check for objects to be sliced (Raycasting or Trigger Zones)
+        let slicedObjects = []; // Collect objects to be sliced
+        // Logic to detect collision with sliceMask layer
+        return slicedObjects;
+    }
+
+    sliceObject(obj) {
+        // Logic to slice the object (you may need to manually manipulate geometry)
+        // Return sliced hull data
+        return obj;
+    }
+
+    createUpperHull(slicedObject) {
+        // Create the upper half of the sliced object (custom logic required)
+        let upperHull = slicedObject.clone(); // Example
+        return upperHull;
+    }
+
+    createLowerHull(slicedObject) {
+        // Create the lower half of the sliced object (custom logic required)
+        let lowerHull = slicedObject.clone(); // Example
+        return lowerHull;
+    }
+
+    makeItPhysical(obj) {
+        // Make object physical (add a mesh collider and rigidbody)
+        obj.addComponent(WPhysicsCollider);
+        obj.addComponent(WRigidbody);
+
+        // Calculate mass (using volume and density)
+        let volume = obj.getScale().x * obj.getScale().y * obj.getScale().z;
+        let density = 1141; // Example density
+        obj.getComponent(WRigidbody).setMass(volume * density);
+    }
+}
